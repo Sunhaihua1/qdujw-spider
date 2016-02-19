@@ -25,9 +25,10 @@ class qdujw:
 
     # 教务登录
     def login(self):
-        global sid, passwd
+        global sid, passwd, jw
         loginurl = 'http://jw.qdu.edu.cn/academic/j_acegi_security_check'
         codeurl = 'http://jw.qdu.edu.cn/academic/getCaptcha.do'
+        userurl = 'http://jw.qdu.edu.cn/academic/showPersonalInfo.do'
 
         # 验证码
         code = self.s.get(codeurl, headers=self.headers, stream=True)
@@ -60,28 +61,26 @@ class qdujw:
             'j_password': passwd,
             'j_captcha': codetext
         }
-        self.s.post(loginurl, postdata)
+        r = self.s.post(loginurl, postdata)
 
-    # 判断是否登录成功
-    def pd(self):
-        testurl = 'http://jw.qdu.edu.cn/academic/showHeader.do'
-        userurl = 'http://jw.qdu.edu.cn/academic/showPersonalInfo.do'
+        # 密码错误
+        if re.search(u'\u5bc6\u7801\u4e0d\u5339\u914d', r.text):
+            print '密码不匹配!'
+            passwd = getpass.getpass('请重新输入密码：')
+            jw.login()
 
-        userpage = self.s.get(userurl).content
+        # 验证码错误
+        elif re.search(u'\u9a8c\u8bc1\u7801\u4e0d\u6b63\u786e', r.text):
+            print '正在登录，请耐心等待......'
+            jw.login()
 
-        if re.search(b'\d{12}', userpage):
-            user = re.findall(
-                b'<span>(.*?)\((.*?)\)</span>', self.s.get(testurl).content, re.S)
-            for u in user:
-                print
-                print '你好！' + u[0] + '，欢迎登录！'
+        # 成功
+        else:
+            userpage = self.s.get(userurl).content
             userid = re.findall(b'.*?userid=(.*?)"', userpage, re.S)
             for i in userid:
                 self.userid = self.userid * 10 + int(i)
-            return 0
-        else:
-            print '登录中，请稍等......'
-            return 1
+            print '登录成功！'
 
     # 查询成绩
     def scores(self):
@@ -151,10 +150,6 @@ sid = raw_input('学号：')
 passwd = getpass.getpass('密码：')
 
 jw.login()
-
-# 判断是否登录成功，失败则继续登录
-while jw.pd():
-    jw.login()
 
 while 1:
     print
