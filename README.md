@@ -1,9 +1,13 @@
 # 青岛大学教务爬虫
-> Python 2 环境
+> Python 2.7
 
 ## 介绍
 本爬虫可以查询教务通知，并且登录教务系统，进行成绩查询，课表查询等
-使用 Pillow 进行图片保存，request 进行登录，BeautifulSoup 进行内容解析，tesseract 进行验证码识别
+
+- Pillow 图片操作
+- request 登录
+- BeautifulSoup 内容解析
+- tesseract 验证码识别
 
 ## 未完成
 - 将课表中，课程，教师，时间等分隔开
