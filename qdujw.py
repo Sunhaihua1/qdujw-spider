@@ -66,7 +66,25 @@ class qdujw:
         # 密码错误
         if re.search(u'\u5bc6\u7801\u4e0d\u5339\u914d', r.text):
             print '密码不匹配!'
-            passwd = getpass.getpass('请重新输入密码：')
+            print
+            choice = raw_input('请选择(1.重新输入 2.退出)：')
+            if choice == '1':
+                sid = raw_input('学号：')
+                passwd = getpass.getpass('密码：')
+            else:
+                exit()
+            jw.login()
+
+        # 用户名不存在
+        elif re.search(u'\u4e0d\u5b58\u5728', r.text):
+            print '用户名"' + sid + '"不存在!'
+            print
+            choice = raw_input('请选择(1.重新输入 2.退出)：')
+            if choice == '1':
+                sid = raw_input('学号：')
+                passwd = getpass.getpass('密码：')
+            else:
+                exit()
             jw.login()
 
         # 验证码错误
@@ -131,9 +149,9 @@ class qdujw:
     def news(self):
         newsurl = 'http://jw.qdu.edu.cn/homepage/infoArticleList.do;jsessionid=E06A6E2B5FA3F797FAB8FA5F6331AC92?columnId=358'
         news = BeautifulSoup(requests.get(newsurl).content, "lxml")
-        for tt in news.find_all(href=re.compile("articleId")):
-            print tt.get_text(strip=True)
-            print tt.get('href')
+        for tz in news.find_all(href=re.compile("articleId")):
+            print tz.get_text(strip=True)
+            print 'http://jw.qdu.edu.cn/homepage/' + tz.get('href')
             print
 
 
